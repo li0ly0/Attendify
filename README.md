@@ -4,6 +4,16 @@
 
 ---
 
+## 🖼️ Interface Preview
+
+| Login Page | Dashboard Overview |
+| :---: | :---: |
+| ![Login](./images/login.png) | ![Dashboard](./images/dashboard.png) |
+
+| Employee Management | Attendance Summary |
+| :---: | :---: |
+| ![Employees](./images/employees.png) | ![Summary](./images/summary.png) |
+
 ## Key Features
 
 * **Real-time Dashboard:** Track live check-ins, late arrivals, and absent personnel at a glance.
