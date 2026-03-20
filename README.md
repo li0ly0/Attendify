@@ -14,7 +14,9 @@
 | :---: | :---: |
 | ![Employees](./images/employees.png) | ![Summary](./images/summary.png) |
 
-![Demo](./images/Attendify.gif)
+<p align="center">
+  <img src="./images/Attendify.gif" alt="Attendify Demo Walkthrough" width="100%">
+</p>
 ---
 ## Key Features
 
