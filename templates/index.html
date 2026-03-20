@@ -1,0 +1,1473 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Attendify</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('app-theme');
+            if (savedTheme === 'light') {
+                document.documentElement.setAttribute('data-theme', 'light');
+            } else {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            }
+        })();
+    </script>
+    <style>
+        :root {
+            /* SLEEK BLACK MODERN VARIABLES */
+            --accent-primary: #ffffff; 
+            --accent-secondary: #a1a1aa; 
+            --accent-glow: rgba(255, 255, 255, 0.15);
+            
+            --font-sans: 'Inter', system-ui, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+
+            --bg-color-1: #000000; 
+            
+            --glass-bg: #0a0a0a; 
+            --glass-border: rgba(255, 255, 255, 0.06); 
+            --glass-shadow: 0 25px 50px -12px rgba(0, 0, 0, 1);
+            --glass-panel-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.8), 0 4px 6px -2px rgba(0, 0, 0, 0.6);
+            
+            --text-primary: #ffffff; 
+            --text-secondary: #a1a1aa; 
+            --text-muted: #52525b; 
+            --border-color: rgba(255, 255, 255, 0.08);
+            --input-bg: #121212;
+            --hover-bg: rgba(255, 255, 255, 0.04);
+
+            --status-present-bg: rgba(16, 185, 129, 0.1); --status-present-text: #34d399;
+            --status-late-bg: rgba(245, 158, 11, 0.1); --status-late-text: #fbbf24;
+            --status-absent-bg: rgba(239, 68, 68, 0.1); --status-absent-text: #f87171;
+            --status-out-bg: rgba(255, 255, 255, 0.05); --status-out-text: #a1a1aa;
+            --status-log-break-bg: rgba(56, 189, 248, 0.1); --status-log-break-text: #7dd3fc;
+            --status-break-bg: rgba(168, 85, 247, 0.1); --status-break-text: #d8b4fe;
+            --status-overbreak-bg: rgba(249, 115, 22, 0.1); --status-overbreak-text: #fdba74;
+            --status-undertime-bg: rgba(236, 72, 153, 0.1); --status-undertime-text: #f472b6;
+            --status-overtime-bg: rgba(249, 115, 22, 0.1); --status-overtime-text: #fb923c;
+        }
+
+        :root[data-theme="light"] {
+            /* SLEEK MONOCHROME LIGHT VARIABLES */
+            --accent-primary: #000000; 
+            --accent-secondary: #52525b; 
+            --accent-glow: rgba(0, 0, 0, 0.15);
+
+            --bg-color-1: #fafafa; 
+            
+            --glass-bg: #ffffff; 
+            --glass-border: rgba(0, 0, 0, 0.08); 
+            --glass-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.08);
+            --glass-panel-shadow: 0 8px 12px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+            
+            --text-primary: #09090b; 
+            --text-secondary: #52525b; 
+            --text-muted: #a1a1aa; 
+            --border-color: rgba(0, 0, 0, 0.08);
+            --input-bg: #f4f4f5;
+            --hover-bg: rgba(0, 0, 0, 0.03);
+
+            --status-present-bg: rgba(16, 185, 129, 0.15); --status-present-text: #059669;
+            --status-late-bg: rgba(245, 158, 11, 0.15); --status-late-text: #d97706;
+            --status-absent-bg: rgba(239, 68, 68, 0.15); --status-absent-text: #dc2626;
+            --status-out-bg: rgba(0, 0, 0, 0.05); --status-out-text: #52525b;
+            --status-log-break-bg: rgba(14, 165, 233, 0.15); --status-log-break-text: #0284c7;
+            --status-break-bg: rgba(168, 85, 247, 0.15); --status-break-text: #7e22ce;
+            --status-overbreak-bg: rgba(249, 115, 22, 0.15); --status-overbreak-text: #c2410c;
+            --status-undertime-bg: rgba(236, 72, 153, 0.15); --status-undertime-text: #db2777;
+            --status-overtime-bg: rgba(249, 115, 22, 0.15); --status-overtime-text: #ea580c;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body { 
+            font-family: var(--font-sans); 
+            color: var(--text-primary); 
+            min-height: 100vh; 
+            -webkit-font-smoothing: antialiased; 
+            background-color: var(--bg-color-1);
+            background-image: 
+                radial-gradient(circle at 15% 0%, rgba(255, 255, 255, 0.03) 0%, transparent 45%),
+                radial-gradient(circle at 85% 100%, rgba(255, 255, 255, 0.02) 0%, transparent 45%);
+            background-attachment: fixed;
+            transition: background-color 0.4s ease, color 0.4s ease;
+        }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(150, 150, 150, 0.25); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(150, 150, 150, 0.4); }
+
+        .flex { display: flex; } .flex-col { flex-direction: column; } .flex-1 { flex: 1 1 0%; }
+        .items-center { align-items: center; } .items-start { align-items: flex-start; }
+        .justify-between { justify-content: space-between; } .justify-center { justify-content: center; }
+        .gap-2 { gap: 0.5rem; } .gap-3 { gap: 0.75rem; } .gap-4 { gap: 1rem; } .gap-6 { gap: 1.5rem; } .gap-8 { gap: 2rem; }
+        .p-6 { padding: 1.5rem; } .p-8 { padding: 2rem; }
+        
+        h1, h2, h3, .stat-value { color: var(--text-primary); letter-spacing: -0.03em; font-weight: 600; }
+        .font-mono { font-family: var(--font-mono); }
+
+        .glass-panel {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--glass-panel-shadow);
+        }
+
+        aside#sidebar { 
+            width: 17rem; display: flex; flex-direction: column; position: sticky; 
+            top: 0; height: 100vh; z-index: 50; border-right: 1px solid var(--border-color);
+            background: transparent; 
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @media (min-width: 1024px) { aside#sidebar.desktop-closed { display: none !important; } }
+        @media (max-width: 1023px) {
+            aside#sidebar { position: fixed; z-index: 100; transform: translateX(-100%); background: var(--bg-color-1); box-shadow: 20px 0 40px rgba(0,0,0,0.8); }
+            aside#sidebar.mobile-open { transform: translateX(0); }
+        }
+
+        .sidebar-logo-container {
+            display: flex; align-items: center; gap: 0.75rem;
+        }
+        .sidebar-logo-text {
+            font-size: 1.4rem; font-weight: 700; color: var(--text-primary); letter-spacing: -0.05em; margin: 0;
+            text-transform: uppercase;
+        }
+        
+        .nav-link { 
+            display: flex; align-items: center; text-decoration: none; 
+            font-size: 0.85rem; font-weight: 500; border-radius: 0.5rem; 
+            color: var(--text-secondary); transition: all 0.2s ease; 
+            padding: 0.85rem 1rem; margin-bottom: 0.25rem; position: relative;
+            letter-spacing: 0.02em;
+        }
+        .nav-link:hover:not(.active) { background: var(--hover-bg); color: var(--text-primary); }
+        .nav-link.active { 
+            color: var(--bg-color-1); font-weight: 600; 
+            background: var(--text-primary);
+        }
+        
+        .logout-btn { color: var(--text-muted); transition: color 0.3s ease; }
+        .logout-btn:hover { color: #f87171; }
+
+        header { 
+            min-height: 4.5rem; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; 
+            gap: 1rem; position: sticky; top: 0; z-index: 40; padding: 1rem 2.5rem;
+            border-bottom: 1px solid var(--border-color);
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        
+        .clock-badge { background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 999px; padding: 0.4rem 1.25rem; }
+        
+        .theme-toggle {
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 0.4rem;
+            height: 2.25rem;
+            width: 2.25rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        .theme-toggle:hover {
+            color: var(--text-primary);
+            background: var(--hover-bg);
+        }
+
+        .main-content { padding: 2.5rem; overflow-y: auto; }
+        
+        .dashboard-stat-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem; }
+        
+        .dashboard-stat-card {
+            aspect-ratio: 1 / 1; display: flex; flex-direction: column; justify-content: center;
+            padding: 1.25rem; border-radius: 1rem; transition: all 0.3s ease; overflow: hidden; 
+            border: 1px solid var(--border-color); background: var(--glass-bg);
+        }
+        .dashboard-stat-card:hover { transform: translateY(-3px); box-shadow: var(--glass-shadow); border-color: rgba(255,255,255,0.15); }
+        
+        .dashboard-stat-card .inner-flex { display: flex; flex-direction: column-reverse; align-items: center; justify-content: center; text-align: center; gap: 0.75rem; height: 100%; width: 100%; }
+        .dashboard-stat-card .stat-icon-wrapper { padding: 0.75rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: var(--input-bg); border: 1px solid var(--border-color); }
+        .dashboard-stat-card .stat-icon-wrapper svg { width: 1.25rem; height: 1.25rem; }
+        .dashboard-stat-card .stat-text-container { display: flex; flex-direction: column; align-items: center; gap: 0.25rem; width: 100%; }
+        .dashboard-stat-card .stat-label { font-size: clamp(0.65rem, 2vw, 0.75rem); font-weight: 500; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.1em; margin: 0; }
+        .dashboard-stat-card .stat-value { font-size: clamp(1.75rem, 5vw, 2.5rem); font-weight: 600; display: flex; align-items: baseline; justify-content: center; gap: 0.25rem; margin: 0; line-height: 1; letter-spacing: -0.04em; }
+        
+        @media (min-width: 640px) {
+            .dashboard-stat-grid { gap: 1.5rem; }
+            .dashboard-stat-card { aspect-ratio: auto; padding: 2rem; justify-content: flex-start; }
+            .dashboard-stat-card .inner-flex { flex-direction: row; justify-content: space-between; align-items: center; text-align: left; }
+            .dashboard-stat-card .stat-text-container { align-items: flex-start; }
+            .dashboard-stat-card .stat-icon-wrapper { padding: 1rem; border-radius: 50%; }
+            .dashboard-stat-card .stat-icon-wrapper svg { width: 20px; height: 20px; }
+            .dashboard-stat-card .stat-label { font-size: 0.8rem; margin-bottom: 0.25rem; }
+            .dashboard-stat-card .stat-value { font-size: 2.75rem; justify-content: flex-start; }
+        }
+        @media (min-width: 1024px) { .dashboard-stat-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+
+        .card { border-radius: 1rem; padding: 2rem; transition: all 0.3s ease; }
+        .card:hover { box-shadow: var(--glass-shadow); border-color: rgba(255,255,255,0.15); }
+        .stat-label { font-size: 0.75rem; font-weight: 500; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.1em; display: block; margin-bottom: 0.5rem; }
+        
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-up { animation: fadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
+        .delay-1 { animation-delay: 0.1s; } .delay-2 { animation-delay: 0.15s; } .delay-3 { animation-delay: 0.2s; } .delay-4 { animation-delay: 0.25s; }
+
+        .filter-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem; align-items: flex-end; }
+        .grid-item-full { grid-column: 1 / -1; }
+        @media (min-width: 640px) { .filter-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.25rem; } .grid-item-full { grid-column: auto; } }
+        @media (min-width: 1200px) {
+            .filter-grid.dashboard-filters { grid-template-columns: repeat(6, 1fr) auto; gap: 1rem; }
+            .filter-grid.summary-filters { grid-template-columns: repeat(4, 1fr) auto; }
+        }
+
+        input, select { 
+            width: 100%; min-width: 0; padding: 0.65rem 1rem; background: var(--input-bg); color: var(--text-primary); 
+            border: 1px solid var(--border-color); border-radius: 0.5rem; font-size: 0.85rem; font-family: var(--font-sans); 
+            transition: all 0.2s ease; font-weight: 400; -webkit-appearance: none; height: 2.75rem; 
+        }
+        select { -webkit-appearance: auto; background-image: none; }
+        input[type="date"], input[type="time"], input[type="datetime-local"] { padding-left: 0.75rem; padding-right: 0.75rem; color: var(--text-secondary); }
+        
+        input[type="date"]::-webkit-calendar-picker-indicator, input[type="time"]::-webkit-calendar-picker-indicator, input[type="datetime-local"]::-webkit-calendar-picker-indicator { opacity: 0.6; cursor: pointer; filter: invert(1); }
+        :root[data-theme="light"] input[type="date"]::-webkit-calendar-picker-indicator, 
+        :root[data-theme="light"] input[type="time"]::-webkit-calendar-picker-indicator,
+        :root[data-theme="light"] input[type="datetime-local"]::-webkit-calendar-picker-indicator { filter: none; }
+        
+        select option { background-color: var(--bg-color-1); color: var(--text-primary); }
+        input:focus, select:focus { outline: none; background: var(--hover-bg); border-color: var(--accent-secondary); box-shadow: 0 0 0 2px var(--accent-glow); color: var(--text-primary); }
+
+        .btn { 
+            height: 2.75rem; padding: 0 1.5rem; border-radius: 0.5rem; font-size: 0.85rem; font-weight: 500; 
+            cursor: pointer; border: none; display: flex; align-items: center; justify-content: center; gap: 0.5rem; 
+            text-decoration: none; transition: all 0.2s ease; letter-spacing: 0.02em;
+        }
+        .btn-slate { background: var(--input-bg); color: var(--text-primary); border: 1px solid var(--border-color); }
+        .btn-slate:hover { background: var(--hover-bg); border-color: rgba(255,255,255,0.2); }
+        .btn-primary { background: var(--text-primary); color: var(--bg-color-1); font-weight: 600; }
+        .btn-primary:hover { background: var(--text-secondary); transform: translateY(-1px); box-shadow: 0 4px 15px rgba(255,255,255,0.1); }
+        .btn-primary:active { transform: translateY(0); }
+
+        .btn-red { background: rgba(239, 68, 68, 0.1); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.2); }
+        :root[data-theme="light"] .btn-red { color: #b91c1c; }
+        .btn-red:hover { background: rgba(239, 68, 68, 0.2); border-color: rgba(239, 68, 68, 0.4); }
+
+        .action-btns { display: flex; gap: 0.5rem; justify-content: flex-end; }
+        .btn-icon { padding: 0; height: 2.25rem; width: 2.25rem; border-radius: 0.5rem; }
+
+        .table-container { border-radius: 1rem; overflow: hidden; width: 100%; border: 1px solid var(--border-color); background: var(--glass-bg); }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        
+        th { padding: 1.25rem 1.5rem; font-size: 0.75rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--border-color); white-space: nowrap; background: rgba(255,255,255,0.02); }
+        td { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border-color); font-size: 0.9rem; font-weight: 400; transition: background 0.2s ease;}
+        th:first-child, td:first-child { padding-left: 2rem; }
+        th:last-child, td:last-child { padding-right: 2rem; }
+        
+        tbody tr { transition: background 0.2s ease; }
+        tbody tr:hover td { background: var(--hover-bg); }
+        
+        .avatar { flex-shrink: 0; width: 2.25rem; height: 2.25rem; border-radius: 50%; background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-primary); display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.85rem; overflow: hidden; }
+        .avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+
+        .status-pill { padding: 0.35rem 0.85rem; border-radius: 0.25rem; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap; display: inline-flex; align-items: center; gap: 0.4rem; border: 1px solid transparent; }
+        .status-pill::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+        
+        .status-pill.on-time { background: var(--status-present-bg); color: var(--status-present-text); border-color: rgba(52, 211, 153, 0.15); }
+        .status-pill.late { background: var(--status-late-bg); color: var(--status-late-text); border-color: rgba(251, 191, 36, 0.15); }
+        .status-pill.absent { background: var(--status-absent-bg); color: var(--status-absent-text); border-color: rgba(248, 113, 113, 0.15); }
+        .status-pill.out { background: var(--status-out-bg); color: var(--status-out-text); border-color: rgba(148, 163, 184, 0.15); }
+        .status-pill.log-break { background: var(--status-log-break-bg); color: var(--status-log-break-text); border-color: rgba(125, 211, 252, 0.15); }
+        .status-pill.break { background: var(--status-break-bg); color: var(--status-break-text); border-color: rgba(216, 180, 254, 0.15); }
+        .status-pill.over-break { background: var(--status-overbreak-bg); color: var(--status-overbreak-text); border-color: rgba(253, 186, 116, 0.15); }
+        .status-pill.under-time { background: var(--status-undertime-bg); color: var(--status-undertime-text); border-color: rgba(244, 114, 182, 0.2); }
+        .status-pill.overtime { background: var(--status-overtime-bg); color: var(--status-overtime-text); border-color: rgba(251, 146, 60, 0.2); }
+
+        .animate-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: .5; transform: scale(1.5); } }
+        .live-indicator { background: transparent; color: var(--text-secondary); padding: 0.4rem 1rem; border-radius: 0.5rem; font-size: 0.75rem; font-weight: 500; display: flex; align-items: center; gap: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em; height: 2.75rem; border: 1px solid var(--border-color); }
+        .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent-secondary); box-shadow: 0 0 8px var(--accent-glow);}
+        
+        .pagination { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 2rem; border-top: 1px solid var(--border-color); background: rgba(255,255,255,0.01); }
+
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); z-index: 100; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s ease; }
+        .modal.active { display: flex; opacity: 1; }
+        .modal-content { background: var(--glass-bg); padding: 3rem; border-radius: 1rem; width: 100%; max-width: 440px; margin: 1.5rem; border: 1px solid var(--border-color); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 1); transform: scale(0.95) translateY(15px); transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); position: relative; overflow-y: auto; max-height: 90vh; }
+        .modal.active .modal-content { transform: scale(1) translateY(0); }
+
+        .directory-search { max-width: 280px; min-width: 180px; border-radius: 0.5rem; padding: 0.65rem 1.25rem; font-size: 0.85rem; }
+
+        .lg-layout { display: grid; grid-template-columns: 1fr; gap: 2rem; width: 100%; min-width: 0; }
+        .log-history-wrapper { width: 100%; min-width: 0; }
+        .side-cards-wrapper { width: 100%; min-width: 0; display: flex; flex-direction: column; gap: 1.5rem; }
+
+        @media (min-width: 1280px) { 
+            .lg-layout { grid-template-columns: 3fr 1fr !important; align-items: stretch; gap: 2.5rem; }
+            .log-history-wrapper { position: relative; height: 100%; }
+            #log-history-card { position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; flex-direction: column; }
+            .side-cards-wrapper { display: flex; flex-direction: column; gap: 2.5rem; height: 100%; }
+            .side-card { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+            .side-card-list { flex: 1; overflow-y: auto; padding-right: 0.5rem; height: 11rem; }
+        }
+        @media (max-width: 1279px) {
+            #log-history-card { max-height: none; height: 60vh; display: flex; flex-direction: column; }
+            .table-scroll-area { flex: 1; max-height: none; }
+            .side-card-list { max-height: 35vh; overflow-y: auto; padding-right: 0.5rem; }
+        }
+
+        @media (max-width: 639px) {
+            header { padding: 1.25rem; }
+            .main-content { padding: 1.5rem 1rem; gap: 1.5rem; } 
+            
+            .filter-grid.dashboard-filters, .filter-grid.summary-filters { display: flex; flex-wrap: wrap; gap: 1rem; }
+            .filter-grid.dashboard-filters > div, .filter-grid.summary-filters > div { width: 100%; }
+            .filter-grid.dashboard-filters .split-field, .filter-grid.summary-filters .split-field { width: calc(50% - 0.5rem); }
+            .filter-grid.dashboard-filters .button-group, .filter-grid.summary-filters .button-group { width: 100%; justify-content: flex-end; margin-top: 0.5rem; }
+            
+            .card, .p-6, .p-8 { padding: 1.5rem !important; }
+            th, td { padding: 1rem 0.85rem !important; font-size: 0.85rem; }
+            th:first-child, td:first-child { padding-left: 1.25rem !important; }
+            th:last-child, td:last-child { padding-right: 1.25rem !important; }
+            
+            .register-employee-form { grid-template-columns: 1fr !important; gap: 1.25rem; }
+
+            .modal-content { padding: 1.5rem !important; margin: 1rem !important; max-height: calc(100vh - 2rem) !important; }
+            .dst-grid { grid-template-columns: 1fr !important; }
+            .modal-content .flex.justify-end { flex-direction: column-reverse; width: 100%; gap: 0.75rem; }
+            .modal-content .flex.justify-end button { width: 100%; }
+        }
+
+        .switch { position: relative; display: inline-block; width: 36px; height: 20px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--input-bg); border: 1px solid var(--border-color); transition: .3s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 12px; width: 12px; left: 3px; bottom: 3px; background-color: var(--text-muted); transition: .3s; border-radius: 50%; }
+        input:checked + .slider { background: rgba(255, 255, 255, 0.15); border-color: var(--text-primary); }
+        input:checked + .slider:before { transform: translateX(16px); background-color: var(--text-primary); box-shadow: 0 0 8px var(--accent-glow); }
+        
+        .dst-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem; }
+        .dst-item { display: flex; justify-content: space-between; align-items: center; padding: 0.85rem 1.25rem; background: var(--input-bg); border-radius: 0.5rem; border: 1px solid var(--border-color); transition: background 0.2s ease;}
+        .dst-item:hover { background: var(--hover-bg); }
+
+    </style>
+</head>
+<body> <div class="flex" style="min-width: 0; width: 100%;">
+        <aside id="sidebar" class="glass-panel" style="border-top: none; border-left: none; border-bottom: none; border-radius: 0;">
+            <div class="p-6 flex items-center justify-center" style="border-bottom: 1px solid var(--border-color); margin-bottom: 1.5rem;">
+                <div class="sidebar-logo-container">
+                    <h2 class="sidebar-logo-text">Attendify</h2>
+                </div>
+            </div>
+            <nav class="flex-1 p-4" style="display: flex; flex-direction: column; gap: 0.5rem;">
+                <div style="font-size: 0.65rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.15em; padding-left: 1rem; margin-bottom: 0.5rem;">Menu Navigation</div>
+                <a href="/" class="nav-link {% if active_page == 'dashboard' %}active{% endif %}">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:1rem; opacity: 0.8;"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+                    Dashboard
+                </a>
+                
+                {% if session.get('role') == 'admin' %}
+                <a href="/summary" class="nav-link {% if active_page == 'summary' %}active{% endif %}">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:1rem; opacity: 0.8;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    Summary
+                </a>
+                <a href="/employees" class="nav-link {% if active_page == 'employees' %}active{% endif %}">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:1rem; opacity: 0.8;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                    Employees
+                </a>
+                {% endif %}
+            </nav>
+
+            <div style="padding: 1.5rem; border-top: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; margin-top: auto; background: rgba(255, 255, 255, 0.01);">
+                <div class="flex items-center gap-3">
+                    <div class="avatar" style="width: 2rem; height: 2rem;">
+                        <img src="/static/avatars/{{ session.get('badge_id', 'admin') }}.jpg" data-fallback="{{ (session.get('username') or 'U')[0]|upper }}" onerror="this.outerHTML=this.getAttribute('data-fallback')" alt="Profile">
+                    </div>
+                    <div style="display: flex; flex-direction: column;">
+                        <span style="font-size: 0.8rem; font-weight: 600; color: var(--text-primary); text-transform: capitalize; letter-spacing: 0.02em;">{{ session.get('username') }}</span>
+                        <span style="font-size: 0.65rem; font-weight: 500; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 0.1rem;">{{ session.get('role') }}</span>
+                    </div>
+                </div>
+                <a href="/logout" title="Sign Out" class="logout-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                </a>
+            </div>
+        </aside>
+
+        <main class="flex-1 flex flex-col" style="min-width: 0;">
+            <header class="glass-panel" style="border-left: none; border-right: none; border-top: none; border-radius: 0;">
+                <div class="flex items-center gap-4">
+                    <button class="btn btn-icon btn-slate" onclick="toggleSidebar()" style="display: none; border-radius: 0.5rem;" id="mobileMenuBtn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" x2="21" y1="12" y2="12"/><line x1="3" x2="21" y1="6" y2="6"/><line x1="3" x2="21" y1="18" y2="18"/></svg>
+                    </button>
+                    <style> @media (max-width: 1023px) { #mobileMenuBtn { display: inline-flex !important; } } </style>
+                    <div>
+                        <h1 style="font-size: clamp(1.1rem, 3vw, 1.4rem); font-weight: 600; line-height: 1.2;">
+                            {% if active_page == 'dashboard' %}
+                            {% elif active_page == 'summary' %}Attendance Summary
+                            {% else %}Employee Directory{% endif %}
+                        </h1>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Theme">
+                        <svg id="theme-icon-light" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                        <svg id="theme-icon-dark" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                    </button>
+
+                    <div class="clock-badge flex items-center gap-2" style="padding: 0.4rem 1.25rem;">
+                        <span id="live-clock" class="font-mono" style="font-size: 0.8rem; font-weight: 500; color: var(--text-primary); letter-spacing: 0.05em;">{{ now }}</span>
+                    </div>
+                </div>
+            </header>
+
+            <div class="main-content" style="display: flex; flex-direction: column; gap: 2.5rem;">
+                
+                {% if active_page == 'employees' and error %}
+                <div style="background: rgba(239, 68, 68, 0.1); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.2); padding: 1.25rem; border-radius: 0.75rem; text-align: center; font-weight: 500; font-size: 0.9rem; animation: fadeUp 0.3s ease;">
+                    {{ error }}
+                </div>
+                {% endif %}
+
+                {% if active_page == 'dashboard' %}
+                
+                <div class="animate-fade-up" style="margin-bottom: 1rem; padding-top: 0.5rem;">
+                    <h1 style="font-size: clamp(2rem, 5vw, 2.75rem); font-weight: 700; letter-spacing: -0.04em; color: var(--text-primary); margin-bottom: 0; line-height: 1.1;">
+                        <span id="time-greeting">{{ greeting }}</span>, <span style="text-transform: capitalize; color: var(--text-primary);">{{ session.get('username', 'Admin') }}</span>.
+                    </h1>
+                    <p style="color: var(--text-secondary); font-size: 1.05rem; letter-spacing: 0.01em;">Here is today's overview.</p>
+                </div>
+
+                <div class="dashboard-stat-grid">
+                    <div class="dashboard-stat-card glass-panel animate-fade-up">
+                        <div class="inner-flex">
+                            <div class="stat-text-container">
+                                <p class="stat-label">Total Employees</p>
+                                <h3 class="stat-value">{{ stats.total }}</h3>
+                            </div>
+                            <div class="stat-icon-wrapper"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--text-muted);"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+                        </div>
+                    </div>
+                    <div class="dashboard-stat-card glass-panel animate-fade-up delay-1">
+                        <div class="inner-flex">
+                            <div class="stat-text-container">
+                                <p class="stat-label">Present</p>
+                                <h3 class="stat-value" style="color: var(--status-present-text);">{{ stats.present }}</h3>
+                            </div>
+                            <div class="stat-icon-wrapper" style="border-color: rgba(16, 185, 129, 0.2);"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--status-present-text);"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
+                        </div>
+                    </div>
+                    <div class="dashboard-stat-card glass-panel animate-fade-up delay-2">
+                        <div class="inner-flex">
+                            <div class="stat-text-container">
+                                <p class="stat-label">Late Arrivals</p>
+                                <h3 class="stat-value" style="color: var(--status-late-text);">{{ stats.late }}</h3>
+                            </div>
+                            <div class="stat-icon-wrapper" style="border-color: rgba(245, 158, 11, 0.2);"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--status-late-text);"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+                        </div>
+                    </div>
+                    <div class="dashboard-stat-card glass-panel animate-fade-up delay-3">
+                        <div class="inner-flex">
+                            <div class="stat-text-container">
+                                <p class="stat-label">Absent</p>
+                                <h3 class="stat-value" style="color: var(--status-absent-text);">{{ stats.absent }}</h3>
+                            </div>
+                            <div class="stat-icon-wrapper" style="border-color: rgba(239, 68, 68, 0.2);"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--status-absent-text);"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" x2="23" y1="8" y2="12"/><line x1="23" x2="19" y1="8" y2="12"/></svg></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="lg-layout">
+                    <div class="log-history-wrapper">
+                        <div id="log-history-card" class="table-container glass-panel flex flex-col animate-fade-up delay-1" style="border: none;">
+                            <div class="p-6 flex justify-between items-center" style="gap: 1rem; flex-wrap: wrap; background: rgba(255,255,255,0.02); border-bottom: 1px solid var(--border-color);">
+                                <h2 style="font-size: 1.05rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Log History <span style="color: var(--text-muted); font-weight: 400; font-size: 0.75rem; margin-left: 0.5rem; background: var(--input-bg); padding: 0.2rem 0.5rem; border-radius: 0.25rem;">{{ stats.total_logs }} records</span></h2>
+                                
+                                <div class="flex items-center gap-3">
+                                    {% if is_dst_active %}
+                                    <div class="live-indicator" style="color: var(--status-log-break-text);" title="Daylight Savings Time Active">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                        DST
+                                    </div>
+                                    {% endif %}
+                                    <div class="live-indicator"><span class="dot animate-pulse"></span>Fetching Data</div>
+                                    
+                                    <button onclick="toggleFilter('dash-filter-drawer')" class="btn btn-slate" style="padding: 0 1rem; height: 2.25rem; font-size: 0.75rem; border-radius: 0.5rem;" title="Toggle Filters">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.4rem;"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+                                        Filter
+                                    </button>
+
+                                    {% if session.get('role') == 'admin' %}
+                                    <a href="/export?search_name={{ filters.search_name|urlencode }}&department_filter={{ filters.department_filter|urlencode }}&status_filter={{ filters.status_filter|urlencode }}&remark_filter={{ filters.remark_filter|urlencode }}&date_from={{ filters.date_from|urlencode }}&date_to={{ filters.date_to|urlencode }}" class="btn btn-slate" style="padding: 0 1rem; height: 2.25rem; font-size: 0.75rem; border-radius: 0.5rem;" title="Download CSV">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.4rem;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                                        Export
+                                    </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            {% set dash_has_filters = filters.search_name or filters.department_filter or filters.status_filter or filters.remark_filter or filters.date_from or filters.date_to %}
+                            <div id="dash-filter-drawer" style="display: {% if dash_has_filters %}block{% else %}none{% endif %}; padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border-color); background: rgba(255,255,255,0.01);">
+                                <form method="GET" action="/" class="filter-grid dashboard-filters" onsubmit="return validateDates('dash_date_from', 'dash_date_to')">
+                                    <div class="search-field" style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                        <label class="stat-label" style="margin-bottom:0;">Employee</label>
+                                        <input type="text" name="search_name" value="{{ filters.search_name }}" placeholder="Search ID or Name...">
+                                    </div>
+                                    <div class="department-field" style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                        <label class="stat-label" style="margin-bottom:0;">Department</label>
+                                        <select name="department_filter">
+                                            <option value="" {% if filters.department_filter == '' %}selected{% endif %}>All Departments</option>
+                                            {% for dept in departments %}
+                                            <option value="{{ dept }}" {% if filters.department_filter == dept %}selected{% endif %}>{{ dept }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="split-field" style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                        <label class="stat-label" style="margin-bottom:0;">Log Type</label>
+                                        <select name="status_filter">
+                                            <option value="" {% if filters.status_filter == '' %}selected{% endif %}>All Types</option>
+                                            <option value="Check In" {% if filters.status_filter == 'Check In' %}selected{% endif %}>Check In</option>
+                                            <option value="Check Out" {% if filters.status_filter == 'Check Out' %}selected{% endif %}>Check Out</option>
+                                            <option value="Break In" {% if filters.status_filter == 'Break In' %}selected{% endif %}>Break In</option>
+                                            <option value="Break Out" {% if filters.status_filter == 'Break Out' %}selected{% endif %}>Break Out</option>
+                                        </select>
+                                    </div>
+                                    <div class="split-field" style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                        <label class="stat-label" style="margin-bottom:0;">Status</label>
+                                        <select name="remark_filter">
+                                            <option value="" {% if filters.remark_filter == '' %}selected{% endif %}>All Status</option>
+                                            <option value="ON-TIME" {% if filters.remark_filter == 'ON-TIME' %}selected{% endif %}>On-Time</option>
+                                            <option value="LATE" {% if filters.remark_filter == 'LATE' %}selected{% endif %}>Late</option>
+                                            <option value="ABSENT" {% if filters.remark_filter == 'ABSENT' %}selected{% endif %}>Absent</option>
+                                            <option value="BREAK" {% if filters.remark_filter == 'BREAK' %}selected{% endif %}>Break</option>
+                                            <option value="OVER BREAK" {% if filters.remark_filter == 'OVER BREAK' %}selected{% endif %}>Over Break</option>
+                                            <option value="UNDER TIME" {% if filters.remark_filter == 'UNDER TIME' %}selected{% endif %}>Under Time</option>
+                                            <option value="OVERTIME" {% if filters.remark_filter == 'OVERTIME' %}selected{% endif %}>Overtime</option>
+                                        </select>
+                                    </div>
+                                    <div class="split-field" style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                        <label class="stat-label" style="margin-bottom:0;">Start Shift</label>
+                                        <input type="date" name="date_from" id="dash_date_from" value="{{ filters.date_from }}">
+                                    </div>
+                                    <div class="split-field" style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                        <label class="stat-label" style="margin-bottom:0;">End Shift</label>
+                                        <input type="date" name="date_to" id="dash_date_to" value="{{ filters.date_to }}">
+                                    </div>
+                                    <div class="button-group flex gap-2">
+                                        <a href="/" class="btn btn-slate" style="padding: 0 1rem;" title="Reset Filters">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                                        </a>
+                                        <button type="submit" class="btn btn-primary" style="flex: 1;">Apply</button>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <div class="table-scroll-area styled-scrollbar" style="overflow-x: auto; overflow-y: auto; flex: 1; min-height: 0; background: transparent;">
+                                <table>
+                                    <thead style="position: sticky; top: 0; z-index: 10; background: var(--glass-bg); backdrop-filter: blur(10px);">
+                                        <tr>
+                                            <th>Badge ID</th>
+                                            <th>Employee</th>
+                                            <th>Department</th>
+                                            <th>Timestamp</th>
+                                            <th>Log Type</th>
+                                            <th>Status</th>
+                                            {% if session.get('role') == 'admin' %}
+                                            <th>Remarks</th>
+                                            <th style="text-align: right;">Actions</th>
+                                            {% endif %}
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for log in logs %}
+                                        <tr>
+                                            <td><span class="font-mono" style="color: var(--text-muted); font-size: 0.8rem;">{{ log.BadgeID }}</span></td>
+                                            <td>
+                                                <div class="flex items-center gap-3">
+                                                    <div class="avatar" style="width: 1.75rem; height: 1.75rem; font-size: 0.7rem; background: transparent; border: 1px solid var(--border-color);">
+                                                        <img src="/static/avatars/{{ log.BadgeID }}.jpg" data-fallback="{{ log.Name[0] }}" onerror="this.outerHTML=this.getAttribute('data-fallback')" alt="Profile">
+                                                    </div>
+                                                    <span style="font-size: 0.85rem; font-weight: 500; color: var(--text-primary); letter-spacing: 0.02em;">{{ log.Name }}</span>
+                                                </div>
+                                            </td>
+                                            <td style="color: var(--text-secondary); font-size: 0.8rem;">{{ log.Dept }}</td>
+                                            <td class="font-mono">
+                                                <span style="color: var(--text-primary); font-weight: 400; font-size: 0.85rem;">{{ log.Time.strftime('%I:%M:%S %p') }}</span><br>
+                                                <span style="font-size: 0.7rem; color: var(--text-muted);">{{ log.Time.strftime('%d %b %Y') }}</span>
+                                            </td>
+                                            <td>
+                                                <span style="font-size: 0.8rem; font-weight: 500; color: var(--text-secondary);">{{ log.DisplayType }}</span>
+                                            </td>
+                                            <td>
+                                                {% set ui_remark = log.Remark %}
+                                                {% if session.get('role') != 'admin' and log.Remark == 'UNDER TIME' %}
+                                                    {% set ui_remark = 'LATE' if log.LateSeconds > 0 else 'ON-TIME' %}
+                                                {% endif %}
+                                                
+                                                <span class="status-pill 
+                                                    {% if ui_remark == 'LATE' %}late
+                                                    {% elif ui_remark == 'ABSENT' %}absent
+                                                    {% elif ui_remark == 'BREAK' %}break
+                                                    {% elif ui_remark == 'OVER BREAK' %}over-break
+                                                    {% elif ui_remark == 'UNDER TIME' %}under-time
+                                                    {% elif ui_remark == 'OVERTIME' %}overtime
+                                                    {% else %}on-time{% endif %}">
+                                                    {{ ui_remark }}
+                                                </span>
+                                                {% if log.ExceededText %}
+                                                <div style="font-size: 0.65rem; color: var(--text-muted); margin-top: 0.4rem; font-weight: 400; letter-spacing: 0.02em;">
+                                                    Exceeded {{ log.ExceededText }}
+                                                </div>
+                                                {% endif %}
+                                            </td>
+                                            {% if session.get('role') == 'admin' %}
+                                            <td>
+                                                <span style="font-size: 0.8rem; color: var(--text-secondary); font-style: italic;">{{ log.SpecialRemark }}</span>
+                                            </td>
+                                            <td style="text-align: right;">
+                                                <div class="action-btns" style="justify-content: flex-end;">
+                                                    <button onclick="openEditLogModal({{ log.LogKey|tojson|forceescape }}, {{ log.Name|tojson|forceescape }}, {{ log.DisplayType|tojson|forceescape }}, {{ log.Remark|tojson|forceescape }})" class="btn btn-slate btn-icon" title="Edit Log" style="border-radius: 0.25rem;">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>
+                                                    </button>
+                                                    <button onclick="openDeleteLogModal({{ log.LogKey|tojson|forceescape }}, {{ log.Name|tojson|forceescape }})" class="btn btn-red btn-icon" title="Remove Log" style="border-radius: 0.25rem;">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                            {% endif %}
+                                        </tr>
+                                        {% else %}
+                                        <tr>
+                                            <td colspan="{% if session.get('role') == 'admin' %}8{% else %}6{% endif %}" style="text-align: center; color: var(--text-muted); padding: 5rem;">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="margin: 0 auto 1rem auto; opacity: 0.2;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                                                <p style="font-size: 0.85rem; font-weight: 400; letter-spacing: 0.05em; text-transform: uppercase;">No Data Available</p>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="pagination">
+                                <div>{% if page > 1 %}<a href="?page={{ page - 1 }}&absent_page={{ absent_page }}&search_name={{ filters.search_name|urlencode }}&department_filter={{ filters.department_filter|urlencode }}&status_filter={{ filters.status_filter|urlencode }}&remark_filter={{ filters.remark_filter|urlencode }}&date_from={{ filters.date_from|urlencode }}&date_to={{ filters.date_to|urlencode }}" class="btn btn-slate" style="padding: 0 1rem; height: 2rem; font-size: 0.75rem; border-radius: 0.5rem;" onclick="fetchPage(event, this.href, 'log-history-card')">Previous</a>{% endif %}</div>
+                                <span style="font-size: 0.75rem; font-weight: 500; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.1em;">Page {{ page }} / {{ total_pages }}</span>
+                                <div>{% if page < total_pages %}<a href="?page={{ page + 1 }}&absent_page={{ absent_page }}&search_name={{ filters.search_name|urlencode }}&department_filter={{ filters.department_filter|urlencode }}&status_filter={{ filters.status_filter|urlencode }}&remark_filter={{ filters.remark_filter|urlencode }}&date_from={{ filters.date_from|urlencode }}&date_to={{ filters.date_to|urlencode }}" class="btn btn-slate" style="padding: 0 1rem; height: 2rem; font-size: 0.75rem; border-radius: 0.5rem;" onclick="fetchPage(event, this.href, 'log-history-card')">Next</a>{% endif %}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="side-cards-wrapper">
+                        <div class="card glass-panel animate-fade-up delay-2 side-card" style="padding: 1.5rem; background: rgba(255,255,255,0.02);">
+                            <h3 style="font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin: 0 0 1.25rem 0; border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem;">Latest Activity</h3>
+                            <div class="side-card-list styled-scrollbar" style="display: flex; flex-direction: column; gap: 1rem;">
+                                {% for log in recent_logs %}
+                                <div class="flex items-center gap-3">
+                                    <div class="avatar" style="width: 1.75rem; height: 1.75rem; font-size: 0.7rem; background: transparent; color: var(--text-secondary); border: 1px solid var(--border-color); box-shadow: none;">
+                                        <img src="/static/avatars/{{ log.BadgeID }}.jpg" data-fallback="{{ log.Name[0] }}" onerror="this.outerHTML=this.getAttribute('data-fallback')" alt="Profile">
+                                    </div>
+                                    <div style="flex: 1;">
+                                        <p style="font-size: 0.8rem; font-weight: 500; color: var(--text-primary); letter-spacing: 0.02em;">{{ log.Name }}</p>
+                                        <div class="flex items-center justify-between" style="margin-top: 0.15rem;">
+                                            <span style="font-size: 0.65rem; font-weight: 400; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">{{ log.DisplayType }}</span>
+                                            <span class="font-mono" style="font-size: 0.7rem; color: var(--text-secondary);">{{ log.Time.strftime('%I:%M %p') }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% else %}
+                                <p style="font-size: 0.75rem; color: var(--text-muted); text-align: center; padding: 2rem 0; font-style: italic;">System idle.</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="card glass-panel animate-fade-up delay-3 side-card" style="padding: 1.5rem; background: rgba(255,255,255,0.02);">
+                            <div id="absent-card-content" style="display: flex; flex-direction: column; height: 100%;">
+                                <div class="flex items-center justify-between" style="margin-bottom: 1.25rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem;">
+                                    <h3 style="font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin: 0;">Absent Today</h3>
+                                    <span style="font-size: 0.75rem; font-weight: 600; color: var(--status-absent-text);">{{ stats.absent }}</span>
+                                </div>
+                                
+                                <div class="side-card-list styled-scrollbar" style="display: flex; flex-direction: column; gap: 1rem; flex: 1;">
+                                    {% for emp in absent_employees %}
+                                    <div class="flex items-center gap-3">
+                                        <div class="avatar" style="width: 1.75rem; height: 1.75rem; font-size: 0.7rem; background: var(--status-absent-bg); color: var(--status-absent-text); border: 1px solid rgba(239, 68, 68, 0.15); box-shadow: none;">
+                                            <img src="/static/avatars/{{ emp.badge }}.jpg" data-fallback="{{ emp.name[0] }}" onerror="this.outerHTML=this.getAttribute('data-fallback')" alt="Profile" style="opacity: 0.5; filter: grayscale(100%);">
+                                        </div>
+                                        <div style="flex: 1;">
+                                            <p style="font-size: 0.8rem; font-weight: 500; color: var(--text-primary); letter-spacing: 0.02em;">{{ emp.name }}</p>
+                                            <div style="margin-top: 0.15rem;">
+                                                <span class="font-mono" style="font-size: 0.65rem; color: var(--text-muted);">ID: {{ emp.badge }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% else %}
+                                    <p style="font-size: 0.75rem; color: var(--text-secondary); text-align: center; padding: 2rem 0; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase;">All personnel logged.</p>
+                                    {% endfor %}
+                                </div>
+
+                                <div class="pagination" style="padding: 1rem 0 0 0; border-top: 1px solid var(--border-color); margin-top: auto; background: transparent;">
+                                    <div>{% if absent_page > 1 %}<a href="?page={{ page }}&absent_page={{ absent_page - 1 }}&search_name={{ filters.search_name|urlencode }}&department_filter={{ filters.department_filter|urlencode }}&status_filter={{ filters.status_filter|urlencode }}&remark_filter={{ filters.remark_filter|urlencode }}&date_from={{ filters.date_from|urlencode }}&date_to={{ filters.date_to|urlencode }}" class="btn btn-slate" style="padding: 0 0.5rem; height: 1.75rem; border-radius: 0.25rem;" onclick="fetchPage(event, this.href, 'absent-card-content')"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></a>{% endif %}</div>
+                                    <span style="font-size: 0.65rem; font-weight: 500; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em;">Pg {{ absent_page }} / {{ absent_total_pages }}</span>
+                                    <div>{% if absent_page < absent_total_pages %}<a href="?page={{ page }}&absent_page={{ absent_page + 1 }}&search_name={{ filters.search_name|urlencode }}&department_filter={{ filters.department_filter|urlencode }}&status_filter={{ filters.status_filter|urlencode }}&remark_filter={{ filters.remark_filter|urlencode }}&date_from={{ filters.date_from|urlencode }}&date_to={{ filters.date_to|urlencode }}" class="btn btn-slate" style="padding: 0 0.5rem; height: 1.75rem; border-radius: 0.25rem;" onclick="fetchPage(event, this.href, 'absent-card-content')"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></a>{% endif %}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="editLogModal" class="modal">
+                    <div class="modal-content" style="max-width: 500px;">
+                        <h3 style="font-size: 1.15rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;">Modify Log Entry</h3>
+                        <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 2rem;">Employee: <span id="editLogEmpName" style="color: var(--text-primary); font-weight: 500;"></span></p>
+                        
+                        <form method="POST" action="/modify_log" style="display: flex; flex-direction: column; gap: 1.25rem;">
+                            <input type="hidden" name="action" value="edit">
+                            <input type="hidden" name="log_key" id="editLogKey">
+                            
+                            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                <label class="stat-label">Log Type</label>
+                                <select name="new_type" id="editLogType" required>
+                                    <option value="Check In">Check In</option>
+                                    <option value="Check Out">Check Out</option>
+                                    <option value="Break In">Break In</option>
+                                    <option value="Break Out">Break Out</option>
+                                </select>
+                            </div>
+                            
+                            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                <label class="stat-label">Status</label>
+                                <select name="new_status" id="editLogStatus" required>
+                                    <option value="ON-TIME">ON-TIME</option>
+                                    <option value="LATE">LATE</option>
+                                    <option value="ABSENT">ABSENT</option>
+                                    <option value="BREAK">BREAK</option>
+                                    <option value="OVER BREAK">OVER BREAK</option>
+                                    <option value="UNDER TIME">UNDER TIME</option>
+                                    <option value="OVERTIME">OVERTIME</option>
+                                </select>
+                            </div>
+                            
+                            <div class="flex gap-3 justify-end" style="margin-top: 1rem;">
+                                <button type="button" class="btn btn-slate" onclick="closeEditLogModal()">Cancel</button>
+                                <button type="submit" class="btn btn-primary">Save Changes</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div id="deleteLogModal" class="modal">
+                    <div class="modal-content" style="border-top: 3px solid #b91c1c;">
+                        <h3 style="font-size: 1.15rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; color: #fca5a5;">Remove Log</h3>
+                        <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 2rem; line-height: 1.5;">Are you sure you want to remove this log for <strong id="deleteLogEmpName" style="color: var(--text-primary);"></strong>? It will not appear in reports or summaries.</p>
+                        
+                        <form method="POST" action="/modify_log" style="display: flex; flex-direction: column; gap: 1.25rem;">
+                            <input type="hidden" name="action" value="delete">
+                            <input type="hidden" name="log_key" id="deleteLogKey">
+                            
+                            <div class="flex gap-3 justify-end" style="margin-top: 1rem;">
+                                <button type="button" class="btn btn-slate" onclick="closeDeleteLogModal()">Cancel</button>
+                                <button type="submit" class="btn btn-red">Remove Log</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                {% elif active_page == 'summary' %}
+
+                <div id="summary-table-content" class="card glass-panel animate-fade-up delay-1" style="padding: 0; overflow: hidden; border: none;">
+                    <div class="p-6 flex justify-between items-center" style="border-bottom: 1px solid var(--border-color); flex-wrap: wrap; gap: 1rem; background: rgba(255,255,255,0.02);">
+                        <h2 style="font-size: 1.05rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Summary List 
+                            {% if search_active %}
+                                <span style="font-size: 0.75rem; font-weight: 400; color: var(--accent-secondary); margin-left: 0.5rem;">[Filtered View]</span>
+                            {% endif %}
+                        </h2>
+                        
+                        <div class="flex items-center gap-3">
+                            <button onclick="toggleFilter('sum-filter-drawer')" class="btn btn-slate" style="padding: 0 1rem; height: 2.25rem; font-size: 0.75rem; border-radius: 0.5rem;" title="Toggle Filters">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.4rem;"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+                                Filter
+                            </button>
+
+                            {% if session.get('role') == 'admin' %}
+                            <a href="/export_summary?search_name={{ filters.search_name|urlencode }}&date_from={{ filters.date_from|urlencode }}&date_to={{ filters.date_to|urlencode }}" class="btn btn-slate" style="padding: 0 1rem; height: 2.25rem; font-size: 0.75rem; border-radius: 0.75rem;" title="Export Filtered Summary CSV">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.4rem;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                                CSV Download
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    {% set sum_has_filters = filters.search_name or filters.department_filter or filters.date_from or filters.date_to %}
+                    <div id="sum-filter-drawer" style="display: {% if sum_has_filters %}block{% else %}none{% endif %}; padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border-color); background: rgba(255,255,255,0.01);">
+                        <form method="GET" action="/summary" class="filter-grid summary-filters" onsubmit="return validateDates('sum_date_from', 'sum_date_to')">
+                            <div class="search-field" style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                <label class="stat-label" style="margin-bottom:0;">Employee</label>
+                                <input type="text" name="search_name" value="{{ filters.search_name }}" placeholder="Search ID or Name...">
+                            </div>
+                            <div class="department-field" style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                <label class="stat-label" style="margin-bottom:0;">Department</label>
+                                <select name="department_filter">
+                                    <option value="" {% if filters.department_filter == '' %}selected{% endif %}>All Departments</option>
+                                    {% for dept in departments %}
+                                    <option value="{{ dept }}" {% if filters.department_filter == dept %}selected{% endif %}>{{ dept }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="split-field" style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                <label class="stat-label" style="margin-bottom:0;">Start</label>
+                                <input type="date" name="date_from" id="sum_date_from" value="{{ filters.date_from }}">
+                            </div>
+                            <div class="split-field" style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                <label class="stat-label" style="margin-bottom:0;">End</label>
+                                <input type="date" name="date_to" id="sum_date_to" value="{{ filters.date_to }}">
+                            </div>
+                            <div class="button-group flex gap-2">
+                                <a href="/summary" class="btn btn-slate" style="padding: 0 1rem;" title="Reset">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                                </a>
+                                <button type="submit" class="btn btn-primary" style="flex: 1;">Apply</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="table-scroll-area styled-scrollbar" style="overflow-x: auto; overflow-y: auto; max-height: 60vh; background: transparent;">
+                        <table>
+                            <thead style="position: sticky; top: 0; z-index: 10; background: var(--glass-bg); backdrop-filter: blur(10px);">
+                                <tr>
+                                    <th>Badge ID</th>
+                                    <th>Employee</th>
+                                    <th>Department</th>
+                                    <th>Present</th>
+                                    <th>Absent</th>
+                                    <th>Dates Absent</th>
+                                    <th>Late</th>
+                                    <th>Total Late</th>
+                                    <th>No Checkout</th>
+                                    <th>Dates No Checkout</th>
+                                    <th>Overbreak</th>
+                                    <th>Total Overbreak</th>
+                                    <th>Overtime</th>
+                                    <th>Total Overtime</th>
+                                    <th>Undertime</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for sum_data in attendance_summary %}
+                                <tr>
+                                    <td><span class="font-mono" style="color: var(--text-muted); font-size: 0.8rem;">{{ sum_data.badge }}</span></td>
+                                    <td>
+                                        <div class="flex items-center gap-3">
+                                            <div class="avatar" style="width: 1.5rem; height: 1.5rem; font-size: 0.65rem; background: transparent; border: 1px solid var(--border-color);">
+                                                <img src="/static/avatars/{{ sum_data.badge }}.jpg" data-fallback="{{ sum_data.name[0] }}" onerror="this.outerHTML=this.getAttribute('data-fallback')" alt="Profile">
+                                            </div>
+                                            <span style="font-weight: 500; color: var(--text-primary); font-size: 0.85rem; letter-spacing: 0.02em;">{{ sum_data.name }}</span>
+                                        </div>
+                                    </td>
+                                    <td style="color: var(--text-secondary); font-size: 0.8rem;">{{ sum_data.dept }}</td>
+                                    
+                                    <td><span class="status-pill on-time" style="font-size: 0.7rem; padding: 0.2rem 0.5rem; background:transparent;">{{ sum_data.present }}</span></td>
+                                    
+                                    <td><span class="status-pill absent" style="font-size: 0.7rem; padding: 0.2rem 0.5rem; background:transparent;">{{ sum_data.absent }}</span></td>
+                                    <td style="font-size: 0.75rem; color: var(--text-secondary); max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="{{ sum_data.absent_dates }}">{{ sum_data.absent_dates }}</td>
+                                    
+                                    <td><span class="status-pill late" style="font-size: 0.7rem; padding: 0.2rem 0.5rem; background:transparent;">{{ sum_data.late }}</span></td>
+                                    
+                                    <td class="font-mono" style="font-size: 0.8rem; color: var(--text-secondary); font-weight: 500;">{{ sum_data.formatted_late }}</td>
+                                    
+                                    <td class="font-mono" style="font-size: 0.8rem; color: var(--status-absent-text); font-weight: 500;">{{ sum_data.no_checkout }}</td>
+                                    <td style="font-size: 0.75rem; color: var(--text-secondary); max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="{{ sum_data.dates_no_checkout }}">{{ sum_data.dates_no_checkout }}</td>
+                                    
+                                    <td><span class="status-pill over-break" style="font-size: 0.7rem; padding: 0.2rem 0.5rem; background:transparent;">{{ sum_data.overbreak }}</span></td>
+                                    
+                                    <td class="font-mono" style="font-size: 0.8rem; color: var(--text-secondary); font-weight: 500;">{{ sum_data.formatted_overbreak }}</td>
+                                    
+                                    <td><span class="status-pill overtime" style="font-size: 0.7rem; padding: 0.2rem 0.5rem; background:transparent;">{{ sum_data.overtime }}</span></td>
+                                    
+                                    <td class="font-mono" style="font-size: 0.8rem; color: var(--text-secondary); font-weight: 500;">{{ sum_data.formatted_overtime }}</td>
+                                    
+                                    <td><span class="status-pill under-time" style="font-size: 0.7rem; padding: 0.2rem 0.5rem; background:transparent;">{{ sum_data.undertime }}</span></td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="15" style="text-align: center; color: var(--text-muted); padding: 5rem;">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="margin: 0 auto 1rem auto; opacity: 0.2;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                                        <p style="font-size: 0.85rem; font-weight: 400; letter-spacing: 0.05em; text-transform: uppercase;">No data within parameters.</p>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="pagination">
+                        <div>{% if page > 1 %}<a href="?page={{ page - 1 }}&search_name={{ filters.search_name|urlencode }}&date_from={{ filters.date_from|urlencode }}&date_to={{ filters.date_to|urlencode }}" class="btn btn-slate" style="padding: 0 1rem; height: 2rem; font-size: 0.75rem; border-radius: 0.5rem;" onclick="fetchPage(event, this.href, 'summary-table-content')">Previous</a>{% endif %}</div>
+                        <span style="font-size: 0.75rem; font-weight: 500; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.1em;">Page {{ page }} / {{ total_pages }}</span>
+                        <div>{% if page < total_pages %}<a href="?page={{ page + 1 }}&search_name={{ filters.search_name|urlencode }}&date_from={{ filters.date_from|urlencode }}&date_to={{ filters.date_to|urlencode }}" class="btn btn-slate" style="padding: 0 1rem; height: 2rem; font-size: 0.75rem; border-radius: 0.5rem;" onclick="fetchPage(event, this.href, 'summary-table-content')">Next</a>{% endif %}</div>
+                    </div>
+                </div>
+
+                {% elif active_page == 'employees' %}
+
+                <div id="directory-card" class="table-container glass-panel flex flex-col animate-fade-up delay-1" style="margin-top: 0.5rem; border: none;">
+                    <div class="p-6 flex justify-between items-center" style="border-bottom: 1px solid var(--border-color); flex-wrap: wrap; gap: 1rem; background: rgba(255,255,255,0.02);">
+                        <h2 style="font-size: 1.05rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Employees List</h2>
+                        <div class="flex items-center gap-3">
+                            <button onclick="openDSTModal()" class="btn btn-slate btn-icon" title="Temporal Shift Configuration (DST)" style="height: 2.5rem; width: 2.5rem; border-radius: 0.75rem;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v2"/><path d="M4.93 4.93l1.41 1.41"/><path d="M2 12h2"/><path d="M19.07 4.93l-1.41 1.41"/><path d="M20 12h2"/><path d="M22 17H2"/><path d="M16 17a4 4 0 0 0-8 0"/></svg>
+                            </button>
+                            
+                            <button onclick="openAddModal()" class="btn btn-slate btn-icon" title="Add New Employee" style="height: 2.5rem; width: 2.5rem; border-radius: 0.75rem;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                            </button>
+                            
+                            <input type="text" id="directorySearch" class="directory-search" placeholder="Search Employee..." value="{{ search_query | default('') }}" onkeyup="searchDirectory()" style="height: 2.5rem; background: var(--input-bg);">
+                        </div>
+                    </div>
+                    
+                    <div id="directory-table-content" style="display: flex; flex-direction: column; flex: 1; background: rgba(255,255,255,0.01);">
+                        <div class="styled-scrollbar" style="overflow-x: auto; overflow-y: auto; max-height: 30rem; flex: 1;">
+                            <table id="directoryTable">
+                                <thead style="position: sticky; top: 0; z-index: 10; background: var(--glass-bg); backdrop-filter: blur(10px);">
+                                    <tr>
+                                        <th>Badge ID</th>
+                                        <th>Employee</th>
+                                        <th>Department</th>
+                                        <th>Weekday Sched</th>
+                                        <th>Weekend Sched</th>
+                                        <th style="text-align: right;">Quick Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for badge, data in employees.items() %}
+                                    <tr>
+                                        <td><span class="font-mono" style="color: var(--text-muted); font-size: 0.8rem;">{{ badge }}</span></td>
+                                        <td>
+                                            <div class="flex items-center gap-3">
+                                                <div class="avatar" style="width: 1.5rem; height: 1.5rem; font-size: 0.65rem; background: transparent; border: 1px solid var(--border-color);">
+                                                    <img src="/static/avatars/{{ badge }}.jpg" data-fallback="{{ data.name[0] }}" onerror="this.outerHTML=this.getAttribute('data-fallback')" alt="Profile">
+                                                </div>
+                                                <span class="employee-name" style="font-weight: 500; color: var(--text-primary); font-size: 0.85rem; letter-spacing: 0.02em;">{{ data.name }}</span>
+                                            </div>
+                                        </td>
+                                        <td style="color: var(--text-secondary); font-size: 0.8rem;">{{ data.department | default('Unassigned') }}</td>
+                                        
+                                        <td class="font-mono" style="color: var(--text-secondary); font-size: 0.85rem; line-height: 1.4;">
+                                            {{ data.time_in }} - {{ data.time_out }}
+                                            {% if data.schedule_history %}
+                                                <br><span style="font-size: 0.65rem; color: var(--accent-secondary); font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase;">(Modified History)</span>
+                                            {% endif %}
+                                        </td>
+                                        
+                                        <td class="font-mono" style="color: var(--text-secondary); font-size: 0.85rem;">
+                                            {% if data.weekend_time_in and data.weekend_time_out %}
+                                                {{ data.weekend_time_in }} - {{ data.weekend_time_out }}
+                                            {% else %}
+                                                <span style="color: var(--text-muted); font-style: italic; font-family: var(--font-sans); font-size: 0.75rem;">No Weekend Shift</span>
+                                            {% endif %}
+                                        </td>
+                                        
+                                        <td style="text-align: right;">
+                                            <div class="action-btns">
+                                                <button onclick="openEditModal({{ badge|tojson|forceescape }}, {{ data.time_in|tojson|forceescape }}, {{ data.time_out|tojson|forceescape }}, {{ (data.department or '')|tojson|forceescape }}, {{ (data.weekend_time_in or '')|tojson|forceescape }}, {{ (data.weekend_time_out or '')|tojson|forceescape }})" class="btn btn-slate btn-icon" title="Modify" style="border-radius: 0.5rem;">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>
+                                                </button>
+                                                <button onclick="openDeleteModal({{ badge|tojson|forceescape }}, {{ data.name|tojson|forceescape }})" class="btn btn-red btn-icon" title="Revoke Access" style="border-radius: 0.5rem;">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% else %}
+                                    <tr>
+                                        <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 5rem;">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="margin: 0 auto 1rem auto; opacity: 0.2;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                                            <p style="font-size: 0.85rem; font-weight: 400; letter-spacing: 0.05em; text-transform: uppercase;">Registry Empty.</p>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="pagination">
+                            <div>{% if page > 1 %}<a href="?page={{ page - 1 }}&search_name={{ (search_query or '')|urlencode }}" class="btn btn-slate" style="padding: 0 1rem; height: 2rem; font-size: 0.75rem; border-radius: 0.5rem;" onclick="fetchPage(event, this.href, 'directory-table-content')">Previous</a>{% endif %}</div>
+                            <span style="font-size: 0.75rem; font-weight: 500; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.1em;">Page {{ page }} / {{ total_pages }}</span>
+                            <div>{% if page < total_pages %}<a href="?page={{ page + 1 }}&search_name={{ (search_query or '')|urlencode }}" class="btn btn-slate" style="padding: 0 1rem; height: 2rem; font-size: 0.75rem; border-radius: 0.5rem;" onclick="fetchPage(event, this.href, 'directory-table-content')">Next</a>{% endif %}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="addModal" class="modal">
+                    <div class="modal-content" style="max-width: 600px;">
+                        <h3 style="font-size: 1.15rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1.5rem;">Register New Employee</h3>
+                        <form method="POST" action="/employees" class="filter-grid register-employee-form" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;">
+                            <input type="hidden" name="action" value="add">
+                            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                <label class="stat-label">System ID (Badge)</label>
+                                <input type="number" name="badge_id" required placeholder="e.g. 177">
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                <label class="stat-label">Full Legal Name</label>
+                                <input type="text" name="name" required placeholder="Jane Doe">
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                <label class="stat-label">Department</label>
+                                <input type="text" name="department" required placeholder="e.g. Engineering">
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                <label class="stat-label">Time-in</label>
+                                <input type="time" name="time_in" required>
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                <label class="stat-label">Time-out</label>
+                                <input type="time" name="time_out" required>
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                <label class="stat-label">W/E Time-in (Opt)</label>
+                                <input type="time" name="weekend_time_in">
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                <label class="stat-label">W/E Time-out (Opt)</label>
+                                <input type="time" name="weekend_time_out">
+                            </div>
+                            <div class="flex gap-3 justify-end grid-item-full" style="margin-top: 1rem;">
+                                <button type="button" class="btn btn-slate" onclick="closeAddModal()">Cancel</button>
+                                <button type="submit" class="btn btn-primary">Register</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div id="editModal" class="modal">
+                    <div class="modal-content">
+                        <h3 style="font-size: 1.15rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;">Modify Employee</h3>
+                        <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 2rem; letter-spacing: 0.02em;">Target Badge ID: <span id="modalBadgeDisplay" class="font-mono" style="color: var(--accent-secondary);"></span></p>
+                        
+                        <form method="POST" action="/employees" style="display: flex; flex-direction: column; gap: 1.25rem;">
+                            <input type="hidden" name="action" value="edit">
+                            <input type="hidden" name="badge_id" id="editBadgeId">
+                            
+                            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                <label class="stat-label">Effective Date</label>
+                                <input type="date" name="effective_date" id="editEffectiveDate" required>
+                            </div>
+
+                            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                <label class="stat-label">Department</label>
+                                <input type="text" name="department" id="editDepartment" required>
+                            </div>
+
+                            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                <label class="stat-label">Time-in</label>
+                                <input type="time" name="time_in" id="editTimeIn" required>
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                <label class="stat-label">Time-out</label>
+                                <input type="time" name="time_out" id="editTimeOut" required>
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                <label class="stat-label">W/E Time-in</label>
+                                <input type="time" name="weekend_time_in" id="editWeekendTimeIn">
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                <label class="stat-label">W/E Time-out</label>
+                                <input type="time" name="weekend_time_out" id="editWeekendTimeOut">
+                            </div>
+                            <div class="flex gap-3 justify-end" style="margin-top: 1rem;">
+                                <button type="button" class="btn btn-slate" onclick="closeEditModal()">Cancel</button>
+                                <button type="submit" class="btn btn-primary">Save</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div id="deleteModal" class="modal">
+                    <div class="modal-content" style="border-top: 3px solid #b91c1c;">
+                        <h3 style="font-size: 1.15rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; color: #fca5a5;">Delete Employee</h3>
+                        <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 2rem; line-height: 1.5;">This will purge <strong id="deleteModalName" style="color: var(--text-primary); font-weight: 600;"></strong> (<span id="deleteModalBadgeDisplay" class="font-mono"></span>) from the registry. This action is irreversible.</p>
+                        
+                        <form method="POST" action="/employees" style="display: flex; flex-direction: column; gap: 1.25rem;">
+                            <input type="hidden" name="action" value="delete">
+                            <input type="hidden" name="badge_id" id="deleteBadgeId">
+                            
+                            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                <label class="stat-label" style="color: #fca5a5;">Authorization Required</label>
+                                <input type="password" name="admin_password" required placeholder="Admin Key" style="border-color: rgba(239, 68, 68, 0.3); background: rgba(239, 68, 68, 0.02);">
+                            </div>
+
+                            <div class="flex gap-3 justify-end" style="margin-top: 1rem;">
+                                <button type="button" class="btn btn-slate" onclick="closeDeleteModal()">Cancel</button>
+                                <button type="submit" class="btn btn-red">Delete</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div id="dstModal" class="modal">
+                    <div class="modal-content" style="max-width: 500px;">
+                        <h3 style="font-size: 1.15rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1.5rem;">Daylight Savings Configuration</h3>
+                        <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1.5rem;">
+                            <label class="stat-label">Effective Date:</label>
+                            <input type="date" id="dstStartDate" onchange="promptDateSave(this)">
+                        </div>
+                        
+                        <label class="stat-label">Departments</label>
+                        <div class="dst-grid" id="dstDepartmentsGrid">
+                            </div>
+                        
+                        <div class="flex justify-end" style="margin-top: 2.5rem;">
+                            <button type="button" class="btn btn-slate" onclick="closeDSTModal()">Close</button>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // --- THEME MANAGEMENT ---
+        function initTheme() {
+            const savedTheme = localStorage.getItem('app-theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            updateThemeIcons(savedTheme);
+        }
+
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('app-theme', newTheme);
+            updateThemeIcons(newTheme);
+        }
+
+        function updateThemeIcons(theme) {
+            const lightIcon = document.getElementById('theme-icon-light');
+            const darkIcon = document.getElementById('theme-icon-dark');
+            if(lightIcon && darkIcon) {
+                if(theme === 'light') {
+                    lightIcon.style.display = 'none';
+                    darkIcon.style.display = 'block';
+                } else {
+                    lightIcon.style.display = 'block';
+                    darkIcon.style.display = 'none';
+                }
+            }
+        }
+        
+        initTheme();
+
+        const DST_SETTINGS = {{ dst_settings | default({}) | tojson }};
+        const ALL_DEPARTMENTS = {{ departments | default([]) | tojson }};
+        
+        // --- LIVE CLOCK & GREETING ---
+        function updateClock() {
+            const now = new Date();
+            
+            // Clock
+            const clockEl = document.getElementById('live-clock');
+            if (clockEl) {
+                let hours = now.getHours();
+                let minutes = now.getMinutes();
+                let seconds = now.getSeconds();
+                const ampm = hours >= 12 ? 'PM' : 'AM';
+                
+                hours = hours % 12;
+                hours = hours ? hours : 12; 
+                
+                hours = hours < 10 ? '0' + hours : hours;
+                minutes = minutes < 10 ? '0' + minutes : minutes;
+                seconds = seconds < 10 ? '0' + seconds : seconds;
+                
+                clockEl.innerText = hours + ':' + minutes + ':' + seconds + ' ' + ampm;
+            }
+            
+            // Greeting (Client-side fallback/update if left open)
+            const greetingEl = document.getElementById('time-greeting');
+            if (greetingEl) {
+                const currentHour = now.getHours();
+                let greeting = 'Good evening';
+                if (currentHour >= 5 && currentHour < 12) {
+                    greeting = 'Good morning';
+                } else if (currentHour >= 12 && currentHour < 17) {
+                    greeting = 'Good afternoon';
+                }
+                if (greetingEl.innerText !== greeting) {
+                    greetingEl.innerText = greeting;
+                }
+            }
+        }
+        setInterval(updateClock, 1000);
+        updateClock(); // Initial call
+
+        // --- FILTER TOGGLE ---
+        function toggleFilter(drawerId) {
+            const drawer = document.getElementById(drawerId);
+            if (drawer.style.display === 'none' || !drawer.style.display) {
+                drawer.style.display = 'block';
+                drawer.style.animation = 'fadeUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards';
+            } else {
+                drawer.style.display = 'none';
+            }
+        }
+
+        // --- BACKEND DIRECTORY SEARCH (DEBOUNCED) ---
+        let dirSearchTimeout;
+        function searchDirectory() {
+            clearTimeout(dirSearchTimeout);
+            dirSearchTimeout = setTimeout(() => {
+                let query = document.getElementById("directorySearch").value;
+                let url = "/employees?search_name=" + encodeURIComponent(query);
+                fetchPage(null, url, 'directory-table-content');
+            }, 300); 
+        }
+
+        // --- SEAMLESS PAGINATION MANAGER (AJAX) ---
+        function fetchPage(event, url, targetId) {
+            if(event) event.preventDefault(); 
+            let card = document.getElementById(targetId);
+            
+            card.style.transition = 'opacity 0.2s ease';
+            card.style.opacity = '0.5';
+            card.style.pointerEvents = 'none';
+
+            fetch(url)
+                .then(response => response.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const newContent = doc.getElementById(targetId).innerHTML;
+                    
+                    card.innerHTML = newContent;
+                    
+                    card.style.opacity = '1';
+                    card.style.pointerEvents = 'auto';
+                })
+                .catch(err => {
+                    console.error('Pagination Error:', err);
+                    window.location.href = url; 
+                });
+        }
+
+        function toggleSidebar() {
+            var sidebar = document.getElementById("sidebar");
+            var isMobile = window.innerWidth < 1024;
+            
+            if (isMobile) {
+                sidebar.classList.toggle("mobile-open");
+            } else {
+                sidebar.classList.toggle("desktop-closed");
+                localStorage.setItem('sidebarDesktopState', sidebar.classList.contains("desktop-closed") ? 'closed' : 'open');
+            }
+        }
+
+        if (window.innerWidth >= 1024 && localStorage.getItem('sidebarDesktopState') === 'closed') {
+            document.getElementById("sidebar").classList.add("desktop-closed");
+        }
+
+        document.addEventListener('click', function(event) {
+            var sidebar = document.getElementById("sidebar");
+            var toggleButton = document.getElementById('mobileMenuBtn');
+            var isMobile = window.innerWidth < 1024;
+            
+            if (isMobile && sidebar && sidebar.classList.contains('mobile-open')) {
+                if (!sidebar.contains(event.target) && toggleButton && !toggleButton.contains(event.target)) {
+                    sidebar.classList.remove('mobile-open');
+                }
+            }
+        });
+
+        // --- EMPLOYEE MODALS ---
+        function openAddModal() { document.getElementById('addModal').classList.add('active'); }
+        function closeAddModal() { document.getElementById('addModal').classList.remove('active'); }
+
+        function openEditModal(badgeId, currentTimeIn, currentTimeOut, currentDept, wTimeIn, wTimeOut) {
+            document.getElementById('editBadgeId').value = badgeId;
+            document.getElementById('modalBadgeDisplay').innerText = badgeId;
+            document.getElementById('editDepartment').value = currentDept;
+            
+            document.getElementById('editEffectiveDate').value = new Date().toISOString().split('T')[0];
+            
+            let formattedTimeIn = currentTimeIn;
+            if (formattedTimeIn && formattedTimeIn.length > 5) formattedTimeIn = formattedTimeIn.substring(0, 5);
+            document.getElementById('editTimeIn').value = formattedTimeIn;
+
+            let formattedTimeOut = currentTimeOut;
+            if (formattedTimeOut && formattedTimeOut.length > 5) formattedTimeOut = formattedTimeOut.substring(0, 5);
+            document.getElementById('editTimeOut').value = formattedTimeOut;
+            
+            let fwTimeIn = wTimeIn && wTimeIn.length > 5 ? wTimeIn.substring(0, 5) : wTimeIn;
+            document.getElementById('editWeekendTimeIn').value = fwTimeIn || '';
+
+            let fwTimeOut = wTimeOut && wTimeOut.length > 5 ? wTimeOut.substring(0, 5) : wTimeOut;
+            document.getElementById('editWeekendTimeOut').value = fwTimeOut || '';
+
+            document.getElementById('editModal').classList.add('active');
+        }
+        function closeEditModal() { document.getElementById('editModal').classList.remove('active'); }
+
+        function openDeleteModal(badgeId, employeeName) {
+            document.getElementById('deleteBadgeId').value = badgeId;
+            document.getElementById('deleteModalBadgeDisplay').innerText = badgeId;
+            document.getElementById('deleteModalName').innerText = employeeName;
+            document.getElementById('deleteModal').classList.add('active');
+        }
+        function closeDeleteModal() { document.getElementById('deleteModal').classList.remove('active'); }
+
+        // --- LOG HISTORY MODALS ---
+        function openEditLogModal(logKey, empName, currentType, currentStatus) {
+            document.getElementById('editLogKey').value = logKey;
+            document.getElementById('editLogEmpName').innerText = empName;
+            document.getElementById('editLogType').value = currentType;
+            document.getElementById('editLogStatus').value = currentStatus;
+            document.getElementById('editLogModal').classList.add('active');
+        }
+        function closeEditLogModal() { document.getElementById('editLogModal').classList.remove('active'); }
+
+        function openDeleteLogModal(logKey, empName) {
+            document.getElementById('deleteLogKey').value = logKey;
+            document.getElementById('deleteLogEmpName').innerText = empName;
+            document.getElementById('deleteLogModal').classList.add('active');
+        }
+        function closeDeleteLogModal() { document.getElementById('deleteLogModal').classList.remove('active'); }
+
+
+        // --- DST MODAL & AJAX LOGIC ---
+        function openDSTModal() {
+            document.getElementById('dstStartDate').value = DST_SETTINGS.start_date || '';
+            const grid = document.getElementById('dstDepartmentsGrid');
+            grid.innerHTML = '';
+            
+            ALL_DEPARTMENTS.forEach(dept => {
+                if(dept === 'N/A') return;
+                const isActive = DST_SETTINGS.departments && DST_SETTINGS.departments[dept] === true;
+                grid.innerHTML += `
+                    <div class="dst-item">
+                        <span style="font-weight: 500; font-size: 0.85rem; letter-spacing: 0.02em;">${dept}</span>
+                        <label class="switch">
+                            <input type="checkbox" onchange="handleDSTToggle(this, '${dept}')" ${isActive ? 'checked' : ''}>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                `;
+            });
+            document.getElementById('dstModal').classList.add('active');
+        }
+
+        function closeDSTModal() { document.getElementById('dstModal').classList.remove('active'); }
+
+        function handleDSTToggle(checkbox, dept) {
+            const newState = checkbox.checked;
+            checkbox.checked = !newState; // Revert visually until password succeeds
+
+            const pwd = prompt("Enter Admin Password to verify operation:");
+            if (!pwd) return;
+
+            fetch('/update_dst', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    password: pwd,
+                    department: dept,
+                    state: newState,
+                    start_date: document.getElementById('dstStartDate').value 
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.success) {
+                    checkbox.checked = newState;
+                    if(!DST_SETTINGS.departments) DST_SETTINGS.departments = {};
+                    DST_SETTINGS.departments[dept] = newState;
+                } else {
+                    alert("Error: " + data.error);
+                }
+            })
+            .catch(err => alert("Network error"));
+        }
+
+        function promptDateSave(inputElem) {
+            const pwd = prompt("Enter Admin Password to verify operation:");
+            if (!pwd) {
+                inputElem.value = DST_SETTINGS.start_date || ''; // revert
+                return;
+            }
+            fetch('/update_dst', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    password: pwd,
+                    start_date: inputElem.value 
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.success) {
+                    DST_SETTINGS.start_date = inputElem.value;
+                } else {
+                    alert("Error: " + data.error);
+                    inputElem.value = DST_SETTINGS.start_date || '';
+                }
+            });
+        }
+
+        // --- DATE VALIDATION ---
+        function validateDates(startId, endId) {
+            const startDateInput = document.getElementById(startId);
+            const endDateInput = document.getElementById(endId);
+            
+            if (startDateInput && endDateInput && startDateInput.value && endDateInput.value) {
+                if (startDateInput.value === endDateInput.value) {
+                    alert("The Start Date and End Date cannot be the same. Please select a date range.");
+                    
+                    const originalStartBorder = startDateInput.style.borderColor;
+                    const originalEndBorder = endDateInput.style.borderColor;
+                    
+                    startDateInput.style.borderColor = "#ef4444";
+                    endDateInput.style.borderColor = "#ef4444";
+                    
+                    setTimeout(() => {
+                        startDateInput.style.borderColor = originalStartBorder;
+                        endDateInput.style.borderColor = originalEndBorder;
+                    }, 2000);
+                    
+                    return false; 
+                }
+                
+                if (new Date(startDateInput.value) > new Date(endDateInput.value)) {
+                    alert("The End Date cannot be before the Start Date.");
+                    return false;
+                }
+            }
+            return true; 
+        }
+
+        function setupDateListeners(startId, endId) {
+            const startEl = document.getElementById(startId);
+            const endEl = document.getElementById(endId);
+            
+            if (startEl && endEl) {
+                const checkDates = () => {
+                    if (startEl.value && endEl.value && startEl.value === endEl.value) {
+                        endEl.setCustomValidity("End date must be different from Start date.");
+                    } else if (startEl.value && endEl.value && new Date(startEl.value) > new Date(endEl.value)) {
+                        endEl.setCustomValidity("End date cannot be before Start date.");
+                    } else {
+                        endEl.setCustomValidity("");
+                    }
+                };
+                
+                startEl.addEventListener('change', checkDates);
+                endEl.addEventListener('change', checkDates);
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            setupDateListeners('dash_date_from', 'dash_date_to');
+            setupDateListeners('sum_date_from', 'sum_date_to');
+        });
+    </script>
+</body>
+</html>
