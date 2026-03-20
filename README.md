@@ -4,7 +4,7 @@
 
 ---
 
-## 🖼️ Interface Preview
+## Interface Preview
 
 | Login Page | Dashboard Overview |
 | :---: | :---: |
