@@ -14,7 +14,7 @@
 | :---: | :---: |
 | ![Employees](./images/employees.png) | ![Summary](./images/summary.png) |
 
-![Demo](./video/Attendify.mp4)
+![Demo](./images/Attendify.gif)
 ---
 ## Key Features
 
