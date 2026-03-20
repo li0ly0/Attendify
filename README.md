@@ -37,7 +37,7 @@
 
 1.  **Clone the repository:**
     ```bash
-    git clone [https://github.com/your-username/attendify.git](https://github.com/your-username/attendify.git)
+    git clone https://github.com/li0ly0/Attendify.git
     cd attendify
     ```
 
