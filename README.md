@@ -17,6 +17,7 @@
 <p align="center">
   <img src="./images/Attendify.gif" alt="Attendify Demo Walkthrough" width="100%">
 </p>
+
 ---
 ## Key Features
 
