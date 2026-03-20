@@ -14,6 +14,7 @@
 | :---: | :---: |
 | ![Employees](./images/employees.png) | ![Summary](./images/summary.png) |
 
+---
 ## Key Features
 
 * **Real-time Dashboard:** Track live check-ins, late arrivals, and absent personnel at a glance.
