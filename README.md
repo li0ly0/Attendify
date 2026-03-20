@@ -1,18 +1,18 @@
 # Attendify: Attendance Monitoring Portal
 
-**Attendify** is a sophisticated, Flask-based web application designed to interface with legacy Microsoft Access biometric databases (`.mdb`). It provides a modern, premium dark-themed UI for real-time monitoring, employee management, and attendance reporting.
+**Attendify** is a Flask-based web application designed to interface with legacy Microsoft Access biometric databases (`.mdb`). It provides a modern, premium dark-themed UI for real-time monitoring, employee management, and attendance reporting.
 
 ---
 
 ## Key Features
 
 * **Real-time Dashboard:** Track live check-ins, late arrivals, and absent personnel at a glance.
-* **Legacy DB Integration:** Direct connection to `att2000.mdb` using `pyodbc`.
+* **Legacy DB Integration:** Direct connection to biometrics using `pyodbc`.
 * **Dynamic Shift Logic:** Supports custom weekday and weekend schedules, with automatic late and undertime detection.
 * **DST (Daylight Savings) Management:** Granular control over temporal shifts on a per-department basis.
 * **Admin Override System:** Manually edit or delete log entries to correct biometric errors.
 * **Comprehensive Reporting:** Export filtered attendance logs and summaries directly to CSV.
-* **Ultra-Modern UI:** Sleek glassmorphism design with Dark/Light mode support and AJAX-powered seamless pagination.
+* **Modern UI:** Glassmorphism design with Dark/Light mode support and AJAX pagination.
 
 ---
 
