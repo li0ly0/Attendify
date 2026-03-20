@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Login - Attendify</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('app-theme');
+            if (savedTheme === 'light') {
+                document.documentElement.setAttribute('data-theme', 'light');
+            } else {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            }
+        })();
+    </script>
+    <style>
+        :root {
+            /* SLEEK BLACK MODERN VARIABLES */
+            --accent-primary: #ffffff; 
+            --accent-secondary: #a1a1aa; 
+            --accent-glow: rgba(255, 255, 255, 0.15);
+            
+            --font-sans: 'Inter', system-ui, sans-serif;
+
+            --bg-color-1: #000000; 
+            
+            --glass-bg: #0a0a0a; 
+            --glass-border: rgba(255, 255, 255, 0.06); 
+            --glass-shadow: 0 25px 50px -12px rgba(0, 0, 0, 1);
+            
+            --text-primary: #ffffff; 
+            --text-secondary: #a1a1aa; 
+            --text-muted: #52525b; 
+            --border-color: rgba(255, 255, 255, 0.08);
+            --input-bg: #121212;
+            --hover-bg: rgba(255, 255, 255, 0.04);
+        }
+
+        :root[data-theme="light"] {
+            /* SLEEK MONOCHROME LIGHT VARIABLES */
+            --accent-primary: #000000; 
+            --accent-secondary: #52525b; 
+            --accent-glow: rgba(0, 0, 0, 0.15);
+
+            --bg-color-1: #fafafa; 
+            
+            --glass-bg: #ffffff; 
+            --glass-border: rgba(0, 0, 0, 0.08); 
+            --glass-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.08);
+            
+            --text-primary: #09090b; 
+            --text-secondary: #52525b; 
+            --text-muted: #a1a1aa; 
+            --border-color: rgba(0, 0, 0, 0.08);
+            --input-bg: #f4f4f5;
+            --hover-bg: rgba(0, 0, 0, 0.03);
+        }
+        
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { 
+            font-family: var(--font-sans); color: var(--text-primary); 
+            min-height: 100vh; display: flex; align-items: center; justify-content: center;
+            background-color: var(--bg-color-1);
+            background-image: 
+                radial-gradient(circle at 15% 0%, rgba(255, 255, 255, 0.03) 0%, transparent 45%),
+                radial-gradient(circle at 85% 100%, rgba(255, 255, 255, 0.02) 0%, transparent 45%);
+            background-attachment: fixed;
+            padding: 1.5rem; 
+            transition: background-color 0.4s ease, color 0.4s ease;
+            -webkit-font-smoothing: antialiased; 
+        }
+        
+        .login-card {
+            background: var(--glass-bg); 
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border); box-shadow: var(--glass-shadow);
+            padding: 3.5rem 3rem; border-radius: 1rem; width: 100%; max-width: 420px;
+            animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        
+        h2 { text-align: center; font-size: 1.75rem; font-weight: 700; margin-bottom: 0.25rem; letter-spacing: -0.04em; color: var(--text-primary); text-transform: uppercase; }
+        p.subtitle { color: var(--text-secondary); text-align: center; margin-bottom: 2.5rem; font-size: 0.9rem; font-weight: 400; letter-spacing: 0.02em; }
+        
+        .input-group { margin-bottom: 1.5rem; display: flex; flex-direction: column; gap: 0.5rem; }
+        label { font-size: 0.75rem; font-weight: 500; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.1em; display: block; }
+        
+        input { 
+            width: 100%; min-width: 0; padding: 0.85rem 1.25rem; background: var(--input-bg); color: var(--text-primary); 
+            border: 1px solid var(--border-color); border-radius: 0.5rem; font-size: 0.95rem; font-family: var(--font-sans); 
+            transition: all 0.2s ease; height: 3rem; font-weight: 400;
+        }
+        input:focus { outline: none; background: var(--hover-bg); border-color: var(--accent-secondary); box-shadow: 0 0 0 2px var(--accent-glow); }
+        
+        .btn-primary { 
+            width: 100%; height: 3rem; border-radius: 0.5rem; font-size: 0.95rem; font-weight: 600; cursor: pointer; border: none; 
+            background: var(--text-primary); color: var(--bg-color-1); 
+            transition: all 0.2s ease; margin-top: 1rem; letter-spacing: 0.02em;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .btn-primary:hover { background: var(--text-secondary); transform: translateY(-1px); box-shadow: 0 4px 15px rgba(255,255,255,0.1); }
+        .btn-primary:active { transform: translateY(0); }
+        :root[data-theme="light"] .btn-primary:hover { box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        
+        .error { color: #fca5a5; background: rgba(239, 68, 68, 0.1); padding: 1rem; border-radius: 0.5rem; font-size: 0.85rem; text-align: center; margin-bottom: 1.5rem; border: 1px solid rgba(239, 68, 68, 0.2); font-weight: 500; }
+        :root[data-theme="light"] .error { color: #b91c1c; }
+
+        @media (max-width: 480px) { .login-card { padding: 2.5rem 1.5rem; } }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <h2>Attendify</h2>
+        <p class="subtitle">Attendance Monitoring Portal</p>
+        
+        {% if error %}
+        <div class="error">{{ error }}</div>
+        {% endif %}
+        
+        <form method="POST" action="/login">
+            <div class="input-group">
+                <label>Username</label>
+                <input type="text" name="username" required placeholder="admin or user">
+            </div>
+            <div class="input-group">
+                <label>Password</label>
+                <input type="password" name="password" required placeholder="••••••••">
+            </div>
+            <button type="submit" class="btn-primary">Log In</button>
+        </form>
+    </div>
+</body>
+</html>
