@@ -2,6 +2,7 @@
 
 **Attendify** is a Flask-based responsive web application designed to interface with legacy Microsoft Access biometric databases (`.mdb`). It provides a dark-themed UI for real-time monitoring, employee management, and attendance reporting.
 
+Note: This project is provided strictly as a foundational template. The default UI might suck depending on your specific needs or tastes, but because it relies entirely on utility classes, it is highly customizable. Feel free to rip the Tailwind apart and make it your own!
 ---
 
 ## Interface Preview
